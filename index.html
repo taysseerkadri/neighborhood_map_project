@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Digbeth, Birmingham</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-sm-2">
+                <div id="floating-panel">
+                    <p><h3 class="tableheader">Toggle Availability: </h3></p>
+                    <table class="table info">
+                        <tr class="primary">
+                            <td><input type="checkbox" id="afterhours"></td><td style="color: white;">Open After 8 PM</td>
+                        </tr>
+                    </table>
+
+                    <div class="divider"></div>
+                    <p><h3 class="tableheader">Select your interests:</h3></p>
+                    <table class="table info">
+                        <tr class="info">
+                            <td><input type="checkbox" id="transit"></td> <td>Transit Options</td>
+                        </tr>
+                        <tr class="info">
+                            <td><input type="checkbox" id="food"></td> <td>Restaurants and Food</td>
+                        </tr>
+                        <tr class="info">
+                            <td><input type="checkbox" id="hotel"></td> <td>Hotels and Inns</td>
+                        </tr>
+                        <tr class="info">
+                            <td><input type="checkbox" id="shopping"></td> <td>Shopping</td>
+                        </tr>
+                        <tr class="info">
+                            <td><input type="checkbox" id="entertainment"></td> <td>Entertainment</td>
+                        </tr>
+                        <tr class="info">
+                            <td><input type="checkbox" id="nightlife"></td> <td>Night Life</td>
+                        </tr>
+                    </table>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search places..." aria-describedby="basic-addon1">
+                        <span class="input-group-addon" id="basic-addon1">@</span>
+                    </div>
+                    <ul class="list-group" data-bind="foreach: locations">
+                        <li class="list-group-item" data-bind="text: title"></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-sm-10">
+                <div id="map"></div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Load Links and Scripts Here-->
+    <script type="text/javascript" src="js/knockout-3.4.2.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="js/script.js"></script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvHXKrTdtSwUwouxr2UjP4jhyCXsQ6u58&v=3&callback=initMap">
+    </script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</body>
+</html>
