@@ -47,7 +47,7 @@
         // The following group uses the location array to create an array of markers on initialize.
         for (var i = 0; i < locations.length; i++) {
           // Get the position from the location array.
-          var position = locations[i].location;
+          var position = location[i].location;
           var title = locations[i].title;
           // Create a marker per location, and put into markers array.
           var marker = new google.maps.Marker({

@@ -21,33 +21,13 @@
                     </table>
 
                     <div class="divider"></div>
-                    <p><h3 class="tableheader">Select your interests:</h3></p>
-                    <table class="table info">
-                        <tr class="info">
-                            <td><input type="checkbox" id="transit"></td> <td>Transit Options</td>
-                        </tr>
-                        <tr class="info">
-                            <td><input type="checkbox" id="food"></td> <td>Restaurants and Food</td>
-                        </tr>
-                        <tr class="info">
-                            <td><input type="checkbox" id="hotel"></td> <td>Hotels and Inns</td>
-                        </tr>
-                        <tr class="info">
-                            <td><input type="checkbox" id="shopping"></td> <td>Shopping</td>
-                        </tr>
-                        <tr class="info">
-                            <td><input type="checkbox" id="entertainment"></td> <td>Entertainment</td>
-                        </tr>
-                        <tr class="info">
-                            <td><input type="checkbox" id="nightlife"></td> <td>Night Life</td>
-                        </tr>
-                    </table>
+
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search places..." aria-describedby="basic-addon1">
                         <span class="input-group-addon" id="basic-addon1">@</span>
                     </div>
-                    <ul class="list-group" data-bind="foreach: locations">
-                        <li class="list-group-item" data-bind="text: title"></li>
+                    <ul class="list-group" data-bind="foreach: showlocations">
+                        <li class="list-group-item button btn-primary" data-bind="text: title"></li>
                     </ul>
                 </div>
             </div>

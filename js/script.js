@@ -23,7 +23,7 @@ var locationStore = [
 
         {title: 'Genting Casino Chinatown Birmingham', type: 'nightlife', location: {lat: 52.4746765, lng: -1.9006145}},
         {title: 'Boltz Club', type: 'nightlife', location: {lat: 52.4747277, lng: -1.9006566}},
-        {title: 'NUTS LIVEPOKER Limited', type: 'nightlife', location: {lat: 52.4908262, lng: 1.9108382}}
+        {title: 'NUTS LIVEPOKER Limited', type: 'nightlife', location: {lat: 52.4908262, lng: -1.9108382}}
     ];
 var daystyles = [
     {
@@ -181,6 +181,38 @@ function initMap(style) {
         zoom: 15,
         styles: style
     });
+    var largeInfowindow = new google.maps.InfoWindow();
+    var bounds = new google.maps.LatLngBounds();
+    for (var i = 0; i < locationStore.length; i++) {
+        var position = locationStore[i].location;
+        var title = locationStore[i].title;
+        var marker = new google.maps.Marker({
+            map: map,
+            position: position,
+            title: title,
+            animation: google.maps.Animation.DROP,
+            id: i
+        });
+        markers.push(marker);
+        marker.addListener('click', function() {
+            populateInfoWindow(this, largeInfowindow);
+        });
+        bounds.extend(markers[i].position);
+    }
+    map.fitBounds(bounds);
+}
+
+function populateInfoWindow(marker, infowindow) {
+    // Check to make sure the infowindow is not already opened on this marker.
+    if (infowindow.marker != marker) {
+        infowindow.marker = marker;
+        infowindow.setContent('<div>' + marker.title + '</div>');
+        infowindow.open(map, marker);
+        // Make sure the marker property is cleared if the infowindow is closed.
+        infowindow.addListener('closeclick', function () {
+            infowindow.setMarker = null;
+        });
+    }
 }
 
 //Checkbox commands
@@ -196,17 +228,32 @@ $("#afterhours").change(function () {
 });
 
 
+function locationItem(title, type, location){
+    var self = this;
+    self.title = ko.observable(title);
+    self.type = ko.observable(type);
+    self.location = ko.observable(location);
+}
 
-function listLocationsModel() {
+function ViewModel() {
     var self = this;
 
-    self.locations = ko.observableArray([]);
-    for (i=0; i< locationStore.length; i++)
-    {
-            self.locations.push(locationStore[i]);
-    }
+    self.showlocations = ko.observableArray();
 
+    self.init = function () {
+        for (i = 0; i < locationStore.length; i++)
+        {
+            self.showlocations.push(new locationItem
+                (
+                    locationStore[i].title,
+                    locationStore[i].type,
+                    locationStore[i].location
+                )
+            );
+        }
+    };
+}
 
-};
-
-ko.applyBindings (new listLocationsModel());
+var viewModel = new ViewModel();
+ko.applyBindings(viewModel);
+viewModel.init();
