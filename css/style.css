@@ -1,40 +1,98 @@
-html,
-body
-{
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    color: white;
+@media (max-width: 575px) {
+    html,
+    body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        color: white;
+    }
+
+    .tableheader {
+        color: white;
+    }
+
+    #afterhours {
+        color: white;
+    }
+
+    .container-fluid {
+        background-color: black;
+        height: 100%;
+    }
+
+    #map {
+        min-height: 440px;
+        width: 100%;
+        background-color: black;
+    }
+
+    #searchBar {
+        display: none;
+
+    }
+
+    #restaurantList {
+        display: none;
+    }
+    #restaurantDDL{
+        width: 100%;
+        margin-bottom: 10px;
+    }
 }
 
-.tableheader{
-    color: white;
-}
+@media (min-width: 576px) {
 
-#afterhours{
-    color: white;
-}
-.container-fluid
-{
-    background-color: black;
-}
+    html,
+    body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        color: white;
+    }
 
-#floating-panel
-{
-    z-index: 5;
-    padding: 5px;
-    border: 1px solid #999;
-    text-align: center;
-    font-family: 'Roboto','sans-serif';
-    line-height: 30px;
-    padding-left: 10px;
-    background-color: black;
-}
+    .tableheader {
+        color: white;
+    }
 
-#map
-{
-    min-height: 940px;
-    width: 100%;
-    background-color: black;
+    #afterhours {
+        color: white;
+    }
+
+    .container-fluid {
+        background-color: black;
+    }
+
+    #floating-panel {
+        z-index: 5;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        line-height: 30px;
+        padding-left: 10px;
+        background-color: black;
+    }
+
+    #map {
+        min-height: 940px;
+        width: 100%;
+        background-color: black;
+    }
+
+    #restaurantList {
+        max-height: 700px;
+        overflow-y: scroll;
+    }
+
+    #searchBar {
+        width: 100%;
+        padding: 5px;
+    }
+
+    #restaurantDDL{
+        display: none;
+    }
+
+
 }

@@ -11,31 +11,31 @@
     <div class="container-fluid">
         <div class="row">
 
-            <div class="col-sm-2">
+            <div class="col-sm-3 col-md-3 col-lg-2">
                 <div id="floating-panel">
                     <p><h3 class="tableheader">Toggle Availability: </h3></p>
                     <table class="table info">
                         <tr class="primary">
-                            <td><input type="checkbox" id="afterhours"></td><td style="color: white;">Open After 8 PM</td>
+                            <td><input type="checkbox" id="afterhours"></td>
+                            <td style="color: white;">Open After 8 PM</td>
                         </tr>
                     </table>
 
                     <div class="divider"></div>
+                    <select id="restaurantDDL" data-bind="foreach: showlocations">
+                        <option data-bind="text: name"></option>
+                    </select>
 
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search places..." aria-describedby="basic-addon1">
-                        <span class="input-group-addon" id="basic-addon1">@</span>
-                    </div>
-                    <ul class="list-group" data-bind="foreach: showlocations">
-                        <li class="list-group-item button btn-primary" data-bind="text: title"></li>
+                    <input data-bind="event: { keyup: filterResults }" type="text" placeholder="Type here to filter results..." id="searchBar" >
+                    <ul id="restaurantList" class="list-group" data-bind="foreach: showlocations">
+                        <button class="list-group-item button restaurantListItem" data-bind="text: name, click: $parent.selectLocation"></button>
                     </ul>
                 </div>
             </div>
 
-            <div class="col-sm-10">
+            <div class="col-sm-9 col-md-9 col-lg-10">
                 <div id="map"></div>
             </div>
-
         </div>
     </div>
 

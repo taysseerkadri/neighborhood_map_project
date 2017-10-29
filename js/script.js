@@ -1,6 +1,7 @@
+//Initiate necessary variables for user session
 var map;
 var markers = [];
-var zomatoCall = "https://developers.zomato.com/api/v2.1/search?apikey=774bb0d505fcc3058099aef1068ff9bd&lat=52.474942&lon=-1.8983275&radius=2000&count=20";
+var zomatoCall = "https://developers.zomato.com/api/v2.1/search?apikey=774bb0d505fcc3058099aef1068ff9bd&lat=52.4771526&lon=-1.8907827&radius=1000&count=20";
 var daystyles = [
     {
         featureType: 'administrative',
@@ -148,6 +149,8 @@ var nightstyles = [
 ];
 var restaurants = {};
 
+
+//Call Zomato API and retrieve top 20 locations around the neighborhood
 $.ajax({
     url: zomatoCall,
     async: false,
@@ -157,24 +160,110 @@ $.ajax({
     }
 });
 
+// Create a model structure for the Knockout ViewModel
+// to follow when creating items based on the API Call results.
+
+function locationItem(name, cuisines, address, afterhours, latitude, longitude){
+    var self = this;
+    self.name = ko.observable(name);
+    self.cuisines= ko.observable(cuisines);
+    self.address = ko.observable(address);
+    self.afterhours = ko.observable(afterhours);
+    self.location = ko.observable(latitude);
+    self.location = ko.observable(longitude);
+}
+
+function ViewModel() {
+    // Set self variable to reference ViewModel "this" Scope
+    var self = this;
+
+    // showlocations array is will be the array that the list of items on the page will rely on.
+    // All other changes to the arrays will dump final results here for user to interface with
+    self.showlocations = ko.observableArray();
+
+    // allLocations is a list of ALL locations, will be used as a default list for reference
+    self.allLocations = ko.observableArray();
+
+    // On init, load the location values in allLocations and then set the showlocations to
+    // be equivalent to it.
+    self.init = function () {
+        for (var i = 0; i < restaurants.length; i++) {
+
+            // THE API DOES NOT INCLUDE AFTER HOURS INFO.
+            // WE INCLUDE IT HERE ARTIFICIALLY
+            // FOR THE PURPOSES OF THIS PROJECT.
+
+            var afterhours = false;
+            if(i % 2 == 0) {
+                afterhours = true;
+            }
+            self.allLocations.push(
+                new locationItem(
+
+                    restaurants[i].restaurant.name,
+                    restaurants[i].restaurant.cuisines,
+                    restaurants[i].restaurant.location["address"],
+                    afterhours,
+                    restaurants[i].restaurant.location.latitude,
+                    restaurants[i].restaurant.location.longitude
+                )
+            );
+        }
+        self.showlocations(self.allLocations());
+    };
+
+    // filterResults is a function that gets the value of the search query,
+    // and builds a temporary array with the search query affecting the results.
+    // The final results are then loaded into the showlocations array.
+    // this function is called on every keyup event.
+
+    self.filterResults = function(data, event){
+        var tempLocations = ko.observableArray();
+        var params = event.target.value;
+        self.allLocations().forEach(function(v,i){
+            var name = v.name();
+            var search = name.toLowerCase().search(params.toLowerCase());
+            if (search > -1){
+                tempLocations.push(v);
+            }
+        });
+        self.showlocations(tempLocations());
+    };
+
+    // This function focuses the map on the marker relative to the restaurant
+    // chosen.
+    self.selectLocation = function (param) {
+        console.log(param);
+    };
+}
+
+// Initiate Map Render at specified location, according to coordinates
+// Set map style to day time style by default
+// Get coordinates of all locations in JSON data,
+// and create array of markers that need to be rendered.
+
 function initMap(style) {
     if (style == null) {
         style = daystyles
     }
     map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: 52.4785217, lng: -1.8902777},
+        center: {lat: 52.4771526, lng: -1.8907827},
         zoom: 15,
         styles: style
     });
 
     var largeInfowindow = new google.maps.InfoWindow();
-    var bounds = new google.maps.LatLngBounds();
+    var bounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(52.4411273,-1.9444738),
+        new google.maps.LatLng(52.4942329,-1.8864697)
+
+    );
     map.fitBounds(bounds);
 
     for (var i = 0; i < restaurants.length; i++) {
-        var lat = restaurants[0].restaurant.location.latitude;
-        var lng = restaurants[0].restaurant.location.longitude;
-        var position = {'lat': lat, 'lng': lng};
+        var lat = restaurants[i].restaurant.location.latitude;
+        var lng = restaurants[i].restaurant.location.longitude;
+        var position = {lat: parseFloat(lat), lng: parseFloat(lng)};
         var title = restaurants[i].restaurant.name;
         var marker = new google.maps.Marker({
             map: map,
@@ -187,12 +276,14 @@ function initMap(style) {
         marker.addListener('click', function () {
             populateInfoWindow(this, largeInfowindow);
         });
-        bounds.extend(markers[i].position);
+        //bounds.extend(markers[i].position);
     }
 }
 
+
+// Check to make sure to populate the infoWindow.
 function populateInfoWindow(marker, infowindow) {
-    // Check to make sure the infowindow is not already opened on this marker.
+
     if (infowindow.marker != marker) {
         infowindow.marker = marker;
         infowindow.setContent('<div>' + marker.title + '</div>');
@@ -204,7 +295,7 @@ function populateInfoWindow(marker, infowindow) {
     }
 }
 
-//Checkbox commands
+//Checkbox commands, changes style color of map
 $("#afterhours").change(function () {
     if($(this).is(":checked"))
     {
@@ -217,32 +308,9 @@ $("#afterhours").change(function () {
 });
 
 
-function locationItem(title, type, location){
-    var self = this;
-    self.title = ko.observable(title);
-    self.type = ko.observable(type);
-    self.location = ko.observable(location);
-}
 
-function ViewModel() {
-    var self = this;
-
-    self.showlocations = ko.observableArray();
-
-    self.init = function () {
-        /*for (i = 0; i < locationStore.length; i++)
-        {
-            self.showlocations.push(new locationItem
-                (
-                    locationStore[i].title,
-                    locationStore[i].type,
-                    locationStore[i].location
-                )
-            );
-        }*/
-    };
-}
 
 var viewModel = new ViewModel();
 ko.applyBindings(viewModel);
 viewModel.init();
+//console.log(restaurants);
