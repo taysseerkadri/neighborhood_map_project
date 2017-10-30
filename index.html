@@ -13,23 +13,26 @@
 
             <div class="col-sm-3 col-md-3 col-lg-2">
                 <div id="floating-panel">
-                    <p><h3 class="tableheader">Toggle Availability: </h3></p>
+                    <!--<p><h3 class="tableheader">Toggle Availability: </h3></p>
                     <table class="table info">
                         <tr class="primary">
-                            <td><input type="checkbox" id="afterhours"></td>
+                            <td><input type="checkbox" id="afterhours" data-bind="checked: isNight, click: toggleNight"></td>
                             <td style="color: white;">Open After 8 PM</td>
                         </tr>
-                    </table>
+                    </table>-->
 
                     <div class="divider"></div>
+
+
                     <select id="restaurantDDL" data-bind="foreach: showlocations">
                         <option data-bind="text: name"></option>
                     </select>
-
+                    <div style="color: white;"> You can search by name or cuisine type (eg. indian, fast food, etc..)</div>
                     <input data-bind="event: { keyup: filterResults }" type="text" placeholder="Type here to filter results..." id="searchBar" >
                     <ul id="restaurantList" class="list-group" data-bind="foreach: showlocations">
                         <button class="list-group-item button restaurantListItem" data-bind="text: name, click: $parent.selectLocation"></button>
                     </ul>
+
                 </div>
             </div>
 
