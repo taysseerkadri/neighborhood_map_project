@@ -155,7 +155,7 @@ $.ajax({
     async: false,
     dataType: 'json',
     success: function(data){
-        restaurants = data['restaurants']
+        restaurants = data.restaurants;
     }
 });
 
@@ -203,7 +203,7 @@ function ViewModel() {
                 new locationItem(
                     restaurants[i].restaurant.name,
                     restaurants[i].restaurant.cuisines,
-                    restaurants[i].restaurant.location["address"],
+                    restaurants[i].restaurant.location.address,
                     afterhours,
                     restaurants[i].restaurant.location.latitude,
                     restaurants[i].restaurant.location.longitude
@@ -281,7 +281,7 @@ function ViewModel() {
 // Get coordinates of all locations in JSON data,
 // and create array of markers that need to be rendered.
 function initMap(style) {
-    if (style == null){style = daystyles}
+    if (style === null){style = daystyles;}
 
     map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 52.4771526, lng: -1.8907827},
@@ -328,7 +328,7 @@ function initMap(style) {
         var lng = restaurants[i].restaurant.location.longitude;
         var position = {lat: parseFloat(lat), lng: parseFloat(lng)};
         var title = restaurants[i].restaurant.name;
-        var id = restaurants[i].restaurant.id;
+        var zomatoId = restaurants[i].restaurant.id;
         var cuisine = restaurants[i].restaurant.cuisines;
         var menu_url = restaurants[i].restaurant.menu_url;
         var thumb_url = restaurants[i].restaurant.thumb;
@@ -336,7 +336,6 @@ function initMap(style) {
         var marker = new google.maps.Marker({
             map: map,
             position: position,
-            id: id,
             title: title,
             cuisine: cuisine,
             menu_url: menu_url,
@@ -346,7 +345,11 @@ function initMap(style) {
             id: i
         });
         markers.push(marker);
-        marker.addListener('click', function () {
+        markers[i].click = populateInfoWindow(this, largeInfowindow);
+        markers[i].mouseover = this.setIcon(highlightedIcon);
+        markers[i].mouseout = this.setIcon(defaultIcon);
+
+        /**marker.addListener('click', function () {
             populateInfoWindow(this, largeInfowindow);
         });
         marker.addListener('mouseover', function() {
@@ -354,7 +357,7 @@ function initMap(style) {
         });
         marker.addListener('mouseout', function() {
             this.setIcon(defaultIcon);
-        });
+        });**/
         //bounds.extend(markers[i].position);
     }
 }
