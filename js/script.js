@@ -159,8 +159,6 @@ $.ajax({
     }
 });
 
-console.log(restaurants);
-
 // Create a model structure for the Knockout ViewModel
 // to follow when creating items based on the API Call results.
 
@@ -280,13 +278,13 @@ function ViewModel() {
 // Set map style to day time style by default
 // Get coordinates of all locations in JSON data,
 // and create array of markers that need to be rendered.
-function initMap(style) {
-    if (style === null){style = daystyles;}
+function initMap() {
+    //if (style === null){style = daystyles;}
 
     map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 52.4771526, lng: -1.8907827},
         zoom: 15,
-        styles: style
+        styles: daystyles
     });
 
     var largeInfowindow = new google.maps.InfoWindow();
@@ -312,26 +310,27 @@ function initMap(style) {
     // Create a "highlighted location" marker color for when the user
     // mouses over the marker.
     // var highlightedIcon = makeMarkerIcon('FFFF24');
-    var defaultIcon;
-    var highlightedIcon;
-    if (style === daystyles){
+    var defaultIcon = makeMarkerIcon('ffff1a');
+    var highlightedIcon = makeMarkerIcon('99ff33');
+
+    /**if (style === daystyles){
         defaultIcon = makeMarkerIcon('660066');
         highlightedIcon = makeMarkerIcon('ff6600');
     }
     else if (style === nightstyles){
         defaultIcon = makeMarkerIcon('ffff1a');
         highlightedIcon = makeMarkerIcon('99ff33');
-    }
+    }**/
 
-    for (var i = 0; i < restaurants.length; i++) {
-        var lat = restaurants[i].restaurant.location.latitude;
-        var lng = restaurants[i].restaurant.location.longitude;
+    var setMarker = function(index){
+        var lat = restaurants[index].restaurant.location.latitude;
+        var lng = restaurants[index].restaurant.location.longitude;
         var position = {lat: parseFloat(lat), lng: parseFloat(lng)};
-        var title = restaurants[i].restaurant.name;
-        var zomatoId = restaurants[i].restaurant.id;
-        var cuisine = restaurants[i].restaurant.cuisines;
-        var menu_url = restaurants[i].restaurant.menu_url;
-        var thumb_url = restaurants[i].restaurant.thumb;
+        var title = restaurants[index].restaurant.name;
+        var zomatoId = restaurants[index].restaurant.id;
+        var cuisine = restaurants[index].restaurant.cuisines;
+        var menu_url = restaurants[index].restaurant.menu_url;
+        var thumb_url = restaurants[index].restaurant.thumb;
 
         var marker = new google.maps.Marker({
             map: map,
@@ -342,14 +341,9 @@ function initMap(style) {
             thumb_url: thumb_url,
             animation: google.maps.Animation.DROP,
             icon: defaultIcon,
-            id: i
+            id: index
         });
-        markers.push(marker);
-        markers[i].click = populateInfoWindow(this, largeInfowindow);
-        markers[i].mouseover = this.setIcon(highlightedIcon);
-        markers[i].mouseout = this.setIcon(defaultIcon);
-
-        /**marker.addListener('click', function () {
+        marker.addListener('click', function () {
             populateInfoWindow(this, largeInfowindow);
         });
         marker.addListener('mouseover', function() {
@@ -357,10 +351,20 @@ function initMap(style) {
         });
         marker.addListener('mouseout', function() {
             this.setIcon(defaultIcon);
-        });**/
-        //bounds.extend(markers[i].position);
+        });
+
+        markers.push(marker);
+
+    };
+
+
+
+    for (var i = 0; i < restaurants.length; i++) {
+        setMarker(i);
     }
 }
+
+
 
 // Check to make sure to populate the infoWindow.
 function populateInfoWindow(marker, infowindow) {
@@ -402,4 +406,3 @@ $("#afterhours").change(function () {
 var viewModel = new ViewModel();
 ko.applyBindings(viewModel);
 viewModel.init();
-//console.log(restaurants);
