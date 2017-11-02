@@ -1,5 +1,6 @@
 //Initiate necessary variables for user session
 var map;
+var openInfoWindow = "";
 var markers = [];
 var zomatoCall = "https://developers.zomato.com/api/v2.1/search?apikey=774bb0d505fcc3058099aef1068ff9bd&lat=52.4771526&lon=-1.8907827&radius=1000&count=20";
 var daystyles = [
@@ -75,99 +76,38 @@ var daystyles = [
         ]
     }
 ];
-var nightstyles = [
-    {
-        featureType: 'administrative',
-        elementType: 'labels.text.stroke',
-        stylers: [
-            { color: '#66ff33' },
-            { weight: 6 }
-        ]
-    },{
-        featureType: 'administrative',
-        elementType: 'labels.text.fill',
-        stylers: [
-            { color: '#000000' }
-        ]
-    },{
-        featureType: 'landscape',
-        elementType: 'geometry',
-        stylers: [
-            { visibility: 'on' },
-            { color: '#000033' }
-        ]
-    },{
-        featureType: 'poi',
-        elementType: 'geometry',
-        stylers: [
-            { visibility: 'on' },
-            { color: '#660000' }
-        ]
-    },{
-        featureType: 'water',
-        stylers: [
-            { color: '#19a0d8' }
-        ]
-    },{
-        featureType: 'water',
-        elementType: 'labels.text.stroke',
-        stylers: [
-            { lightness: 100 }
-        ]
-    },{
-        featureType: 'water',
-        elementType: 'labels.text.fill',
-        stylers: [
-            { lightness: -100 }
-        ]
-    },{
-        featureType: 'road.highway',
-        elementType: 'geometry.stroke',
-        stylers: [
-            { color: '#9D00FF' }
-        ]
-    },{
-        featureType: 'road.highway',
-        elementType: 'geometry.fill',
-        stylers: [
-            { color: '#efe9e4' },
-            { lightness: -25 }
-        ]
-    },{
-        featureType: 'road.highway',
-        elementType: 'labels.icon',
-        stylers: [
-            { visibility: 'off' }
-        ]
-    },{
-        featureType: 'transit.station',
-        stylers: [
-            { weight: 4 },
-            { hue: '#ffffff' }
-        ]
-    }
-];
+
 var restaurants = {};
 
 //Call Zomato API and retrieve top 20 locations around the neighborhood
+
 $.ajax({
     url: zomatoCall,
-    async: false,
     dataType: 'json',
     success: function(data){
         restaurants = data.restaurants;
+    },
+    error: function (jqXHR, exception){
+        var msg = "<p> jqXHR: " + jqXHR.responseText + "</p>" +
+            "<p> Uncaught exception: " + exception + "</p>";
+        $('#errorMsg').html(msg);
+    },
+    complete: function () {
+        var viewModel = new ViewModel();
+        ko.applyBindings(viewModel);
+        viewModel.init();
+        initMap();
     }
 });
 
 // Create a model structure for the Knockout ViewModel
 // to follow when creating items based on the API Call results.
 
-function locationItem(name, cuisines, address, afterhours, latitude, longitude){
+function locationItem(name, cuisines, address, latitude, longitude){
     var self = this;
     self.name = ko.observable(name);
     self.cuisines= ko.observable(cuisines);
     self.address = ko.observable(address);
-    self.afterhours = ko.observable(afterhours);
     self.location = ko.observable(latitude);
     self.location = ko.observable(longitude);
 }
@@ -183,66 +123,28 @@ function ViewModel() {
     // allLocations is a list of ALL locations, will be used as a default list for reference
     self.allLocations = ko.observableArray();
 
-    // night time
-    //self.isNight = ko.observable(false);
-    //self.allNightLocations = ko.observableArray();
-
     // On init, load the location values in allLocations and then set the showlocations to
     // be equivalent to it.
     self.init = function ()
     {
         for (var i = 0; i < restaurants.length; i++) {
-            // THE API DOES NOT INCLUDE AFTER HOURS INFO.
-            // WE INCLUDE IT HERE ARTIFICIALLY
-            // FOR THE PURPOSES OF THIS PROJECT.
-            var afterhours = false;
-            if(i % 2 === 0) { afterhours = true; }
+
             self.allLocations.push(
                 new locationItem(
                     restaurants[i].restaurant.name,
                     restaurants[i].restaurant.cuisines,
                     restaurants[i].restaurant.location.address,
-                    afterhours,
                     restaurants[i].restaurant.location.latitude,
                     restaurants[i].restaurant.location.longitude
                 )
             );
-            /**if (afterhours === true){
-                self.allNightLocations.push(
-                    new locationItem(
-                        restaurants[i].restaurant.name,
-                        restaurants[i].restaurant.cuisines,
-                        restaurants[i].restaurant.location["address"],
-                        afterhours,
-                        restaurants[i].restaurant.location.latitude,
-                        restaurants[i].restaurant.location.longitude
-                    )
-                );
-            }**/
         }
         self.showlocations(self.allLocations());
     };
-
-
-
     // filterResults is a function that gets the value of the search query,
     // and builds a temporary array with the search query affecting the results.
     // The final results are then loaded into the showlocations array.
     // this function is called on every keyup event.
-
-    /**self.toggleNight = function () {
-        var isnight = self.isNight();
-        if(isnight === true)
-        {
-            self.isNight(false);
-            self.showlocations(self.allLocations);
-        }
-        else{
-            self.isNight(true);
-            self.showlocations(self.allNightLocations());
-        }
-        return true;
-    };**/
 
     self.filterResults = function(data, event){
         var tempLocations = ko.observableArray();
@@ -258,6 +160,19 @@ function ViewModel() {
                 tempLocations.push(v);
             }
         });
+        markers.forEach(function (v, i) {
+                v.setVisible(false);
+        });
+
+        tempLocations().forEach(function (v, i) {
+            var thisLocationName = v.name();
+            markers.forEach(function (v, i) {
+                if (v.title === thisLocationName)
+                {
+                    v.setVisible(true);
+                }
+            });
+        });
         self.showlocations(tempLocations());
     };
 
@@ -265,10 +180,19 @@ function ViewModel() {
     // chosen.
     self.selectLocation = function (param) {
         console.clear();
+        if(openInfoWindow !== "")
+        {
+            openInfoWindow.close();
+        }
         markers.forEach(function (v, i) {
             if (v.title === param.name())
             {
+                console.log(v);
+                v.setAnimation(google.maps.Animation.BOUNCE);
                 populateInfoWindow(v, new google.maps.InfoWindow());
+            }
+            else{
+                v.setAnimation(null);
             }
         });
     };
@@ -278,17 +202,14 @@ function ViewModel() {
 // Set map style to day time style by default
 // Get coordinates of all locations in JSON data,
 // and create array of markers that need to be rendered.
-function initMap() {
-    //if (style === null){style = daystyles;}
 
+function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 52.4771526, lng: -1.8907827},
         zoom: 15,
         styles: daystyles
     });
-
     var largeInfowindow = new google.maps.InfoWindow();
-
     var bounds = new google.maps.LatLngBounds(
         new google.maps.LatLng(52.4411273,-1.9444738),
         new google.maps.LatLng(52.4942329,-1.8864697)
@@ -312,15 +233,6 @@ function initMap() {
     // var highlightedIcon = makeMarkerIcon('FFFF24');
     var defaultIcon = makeMarkerIcon('ffff1a');
     var highlightedIcon = makeMarkerIcon('99ff33');
-
-    /**if (style === daystyles){
-        defaultIcon = makeMarkerIcon('660066');
-        highlightedIcon = makeMarkerIcon('ff6600');
-    }
-    else if (style === nightstyles){
-        defaultIcon = makeMarkerIcon('ffff1a');
-        highlightedIcon = makeMarkerIcon('99ff33');
-    }**/
 
     var setMarker = function(index){
         var lat = restaurants[index].restaurant.location.latitude;
@@ -352,26 +264,20 @@ function initMap() {
         marker.addListener('mouseout', function() {
             this.setIcon(defaultIcon);
         });
-
         markers.push(marker);
-
     };
-
-
 
     for (var i = 0; i < restaurants.length; i++) {
         setMarker(i);
     }
 }
 
-
-
 // Check to make sure to populate the infoWindow.
 function populateInfoWindow(marker, infowindow) {
-
-    if (infowindow.marker != marker) {
-        infowindow.marker = marker;
-        infowindow.setContent
+    openInfoWindow = infowindow;
+    if (openInfoWindow.marker !== marker) {
+        openInfoWindow.marker = marker;
+        openInfoWindow.setContent
         (
             '<div class="container" style="max-width: 400px;">' +
             '<div class="row">' +
@@ -383,26 +289,10 @@ function populateInfoWindow(marker, infowindow) {
             '</div></div></div>'
         );
 
-        infowindow.open(map, marker);
+        openInfoWindow.open(map, marker);
         // Make sure the marker property is cleared if the infowindow is closed.
-        infowindow.addListener('closeclick', function () {
-            infowindow.setMarker = null;
+        openInfoWindow.addListener('closeclick', function () {
+            openInfoWindow.setMarker = null;
         });
     }
 }
-
-//Checkbox commands, changes style color of map
-$("#afterhours").change(function () {
-    if($(this).is(":checked"))
-    {
-        initMap(nightstyles);
-    }
-    else
-    {
-        initMap(daystyles);
-    }
-});
-
-var viewModel = new ViewModel();
-ko.applyBindings(viewModel);
-viewModel.init();
