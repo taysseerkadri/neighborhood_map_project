@@ -215,7 +215,7 @@ function ViewModel() {
                 v.setAnimation(null);
             }
         });
-    }
+    };
 }
 
 // Initiate Map Render at specified location, according to coordinates
