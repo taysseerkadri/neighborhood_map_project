@@ -3,6 +3,13 @@
     color: white;
 }
 
+.blurb{
+    color: white;
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
 @media (max-width: 575px) {
     html,
     body {
@@ -33,7 +40,8 @@
     }
 
     #searchBar {
-        display: none;
+        width: 100%;
+        margin-bottom: 5px;
 
     }
 
@@ -60,11 +68,6 @@
     .tableheader {
         color: white;
     }
-
-    #afterhours {
-        color: white;
-    }
-
     .container-fluid {
         background-color: black;
     }
@@ -82,7 +85,13 @@
     #map {
         min-height: 940px;
         width: 100%;
-        background-color: black;
+        background-color: black
+
+    }
+    #mapError{
+        color: white;
+        text-align: center;
+        font-size: 14px;
     }
 
     #searchBar {

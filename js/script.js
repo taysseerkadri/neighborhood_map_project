@@ -115,10 +115,13 @@ function locationItem(name, cuisines, address, latitude, longitude){
 function ViewModel() {
     // Set self variable to reference ViewModel "this" Scope
     var self = this;
+    self.selectedValue = ko.observable();
 
     // showlocations array is will be the array that the list of items on the page will rely on.
     // All other changes to the arrays will dump final results here for user to interface with
     self.showlocations = ko.observableArray();
+
+
 
     // allLocations is a list of ALL locations, will be used as a default list for reference
     self.allLocations = ko.observableArray();
@@ -177,9 +180,8 @@ function ViewModel() {
     };
 
     // This function focuses the map on the marker relative to the restaurant
-    // chosen.
+    // chosen in the desktop view.
     self.selectLocation = function (param) {
-        console.clear();
         if(openInfoWindow !== "")
         {
             openInfoWindow.close();
@@ -187,7 +189,6 @@ function ViewModel() {
         markers.forEach(function (v, i) {
             if (v.title === param.name())
             {
-                console.log(v);
                 v.setAnimation(google.maps.Animation.BOUNCE);
                 populateInfoWindow(v, new google.maps.InfoWindow());
             }
@@ -196,6 +197,25 @@ function ViewModel() {
             }
         });
     };
+
+    // This function focuses the map on the marker relative to the restaurant
+    // chosen in the mobile view
+    self.changeLocation = function(param){
+        if(openInfoWindow !== "")
+        {
+            openInfoWindow.close();
+        }
+        markers.forEach(function (v, i) {
+            if (v.title === param.selectedValue().name())
+            {
+                v.setAnimation(google.maps.Animation.BOUNCE);
+                populateInfoWindow(v, new google.maps.InfoWindow());
+            }
+            else{
+                v.setAnimation(null);
+            }
+        });
+    }
 }
 
 // Initiate Map Render at specified location, according to coordinates
@@ -272,6 +292,10 @@ function initMap() {
     }
 }
 
+function mapError(e){
+    $('#mapError').html("Error loading MAP API");
+}
+
 // Check to make sure to populate the infoWindow.
 function populateInfoWindow(marker, infowindow) {
     openInfoWindow = infowindow;
@@ -293,6 +317,7 @@ function populateInfoWindow(marker, infowindow) {
         // Make sure the marker property is cleared if the infowindow is closed.
         openInfoWindow.addListener('closeclick', function () {
             openInfoWindow.setMarker = null;
+            marker.setAnimation(null);
         });
     }
 }
