@@ -103,7 +103,7 @@ $.ajax({
 // Create a model structure for the Knockout ViewModel
 // to follow when creating items based on the API Call results.
 
-function locationItem(name, cuisines, address, latitude, longitude){
+function LocationItem(name, cuisines, address, latitude, longitude){
     var self = this;
     self.name = ko.observable(name);
     self.cuisines= ko.observable(cuisines);
@@ -126,6 +126,8 @@ function ViewModel() {
     // allLocations is a list of ALL locations, will be used as a default list for reference
     self.allLocations = ko.observableArray();
 
+    self.errorLocations = ko.observableArray();
+
     // On init, load the location values in allLocations and then set the showlocations to
     // be equivalent to it.
     self.init = function ()
@@ -133,7 +135,7 @@ function ViewModel() {
         for (var i = 0; i < restaurants.length; i++) {
 
             self.allLocations.push(
-                new locationItem(
+                new LocationItem(
                     restaurants[i].restaurant.name,
                     restaurants[i].restaurant.cuisines,
                     restaurants[i].restaurant.location.address,
@@ -161,7 +163,7 @@ function ViewModel() {
             if (searchName > -1 || searchCuisines > -1)
             {
                 tempLocations.push(v);
-            }
+        }
         });
         markers.forEach(function (v, i) {
                 v.setVisible(false);
@@ -205,16 +207,28 @@ function ViewModel() {
         {
             openInfoWindow.close();
         }
-        markers.forEach(function (v, i) {
-            if (v.title === param.selectedValue().name())
-            {
-                v.setAnimation(google.maps.Animation.BOUNCE);
-                populateInfoWindow(v, new google.maps.InfoWindow());
-            }
-            else{
-                v.setAnimation(null);
-            }
-        });
+        try {
+            markers.forEach(function (v, i) {
+                if (v.title === param.selectedValue().name()) {
+                    v.setAnimation(google.maps.Animation.BOUNCE);
+                    populateInfoWindow(v, new google.maps.InfoWindow());
+                }
+                else {
+                    v.setAnimation(null);
+                }
+            });
+        }
+        catch(ex){
+            toastr.error("No matches found",
+                "Sorry",
+                {
+                "positionClass": "toast-top-center",
+                "showDuration": "60000",
+                "hideDuration": "60000",
+                "timeOut": "60000",
+                "extendedTimeOut": "60000"
+            });
+        }
     }
 }
 
@@ -276,6 +290,10 @@ function initMap() {
             id: index
         });
         marker.addListener('click', function () {
+            markers.forEach(function (v, i){
+                    v.setAnimation(null);
+            });
+            this.setAnimation(google.maps.Animation.BOUNCE);
             populateInfoWindow(this, largeInfowindow);
         });
         marker.addListener('mouseover', function() {

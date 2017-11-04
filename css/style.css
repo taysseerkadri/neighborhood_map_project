@@ -10,6 +10,11 @@
     margin-bottom: 5px;
 }
 
+#toast-container>div
+{
+    opacity: 1;
+}
+
 @media (max-width: 575px) {
     html,
     body {
@@ -17,7 +22,6 @@
         width: 100%;
         margin: 0;
         padding: 0;
-        color: white;
     }
 
     .tableheader {
@@ -62,7 +66,6 @@
         width: 100%;
         margin: 0;
         padding: 0;
-        color: white;
     }
 
     .tableheader {
