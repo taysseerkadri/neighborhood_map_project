@@ -202,7 +202,8 @@ function ViewModel() {
 
     // This function focuses the map on the marker relative to the restaurant
     // chosen in the mobile view
-    self.changeLocation = function(param){
+    self.changeLocation = function(param)
+    {
         if(openInfoWindow !== "")
         {
             openInfoWindow.close();
@@ -229,7 +230,7 @@ function ViewModel() {
                 "extendedTimeOut": "60000"
             });
         }
-    }
+    };
 }
 
 // Initiate Map Render at specified location, according to coordinates
