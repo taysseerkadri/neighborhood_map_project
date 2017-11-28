@@ -9,3 +9,14 @@ In this project, you can explore a stylized map of Digbeth, Birmingham with a fi
 Simply load the index.html file in your favorite web browser and play with the map!
 
 For any questions, email taysseer.kadri@gmail.com
+
+## More Info
+This single-page application utilizes Bootstrap 3 and jQuery to make the app mobile friendly.
+
+#### Mobile View - Filter results into a dropdown list:
+
+![alt text](https://i.imgur.com/uM93EaU.png)
+
+#### Desktop View - Filter results into a list of buttons:
+
+![alt text](https://i.imgur.com/rOmpVk3.png)
