@@ -12,8 +12,30 @@ For any questions, email taysseer.kadri@gmail.com
 
 ## More Info
 
-### Back End
-20 Restaurant entries are retrieved from [a link](https://www.zomato.com) asynchronously via the Zomato API. THe jQuery ajax method is utilized in this instance:
+### Model
+20 Restaurant entries are retrieved from [Zomato](https://www.zomato.com) asynchronously via the Zomato API. Once the objects are retrieved, they are loaded into the a Knockout.js based ViewModel to be handeled into the View, and the initMap() function is called to render the map. The jQuery ajax method is utilized in this instance:
+
+> script.js
+```javascript
+$.ajax({
+    url: zomatoCall,
+    dataType: 'json',
+    success: function(data){
+        restaurants = data.restaurants;
+    },
+    error: function (jqXHR, exception){
+        var msg = "<p> jqXHR: " + jqXHR.responseText + "</p>" +
+            "<p> Uncaught exception: " + exception + "</p>";
+        $('#errorMsg').html(msg);
+    },
+    complete: function () {
+        var viewModel = new ViewModel();
+        ko.applyBindings(viewModel);
+        viewModel.init();
+        initMap();
+    }
+});
+```
 
 
 
