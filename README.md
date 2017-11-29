@@ -15,7 +15,8 @@ For any questions, email taysseer.kadri@gmail.com
 ### Model
 20 Restaurant entries are retrieved from [Zomato](https://www.zomato.com) asynchronously via the Zomato API. Once the objects are retrieved, they are loaded into the a Knockout.js based ViewModel to be handeled into the View, and the initMap() function is called to render the map. The jQuery ajax method is utilized in this instance:
 
-> script.js
+script.js
+---
 ```javascript
 $.ajax({
     url: zomatoCall,
@@ -36,14 +37,18 @@ $.ajax({
     }
 });
 ```
-
-
-
 Maps are provided and loaded asynchronously via Google Maps API
 
+### ViewModel
+
+KnockoutJS is used to build a ViewModel class to help handle filtering of the items and their visibility on the map and on the list. Users can filter by cusine type or my restaurant name.
+
+![alt text](https://i.imgur.com/innGQC4.png)
+
+![alt text](https://i.imgur.com/WW48S7W.png)
 
 
-
+### View
 
 This single-page application utilizes Bootstrap 3 and jQuery to make the app mobile friendly.
 
