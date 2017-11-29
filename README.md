@@ -15,7 +15,7 @@ For any questions, email taysseer.kadri@gmail.com
 ### Model
 20 Restaurant entries are retrieved from [Zomato](https://www.zomato.com) asynchronously via the Zomato API. Once the objects are retrieved, they are loaded into the a Knockout.js based ViewModel to be handeled into the View, and the initMap() function is called to render the map. The jQuery ajax method is utilized in this instance:
 
-script.js
+#### script.js
 ---
 ```javascript
 $.ajax({
